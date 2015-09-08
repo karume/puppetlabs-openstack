@@ -37,4 +37,10 @@ class openstack::profile::nova::compute {
     Package['device-mapper'] ~> Service['libvirtd'] ~> Service['nova-compute']
   }
   Package['libvirt'] -> File['/etc/libvirt/qemu.conf']
+
+  exec { "add_midonet_rootwrap":
+    command => "/bin/echo -e '[Filters]\nmm-ctl: CommandFilter, mm-ctl, root' > /etc/nova/rootwrap.d/midonet.filters",
+    require => Class['openstack::common::nova']
+  }
+
 }
