@@ -1,4 +1,4 @@
-# == Class: openstack::profile::neutron::agent
+# == Class: openstack::profile::role::coordination
 #
 # Copyright (c) 2015 Midokura SARL, All Rights Reserved.
 #
@@ -14,7 +14,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
-class openstack::profile::neutron::agent {
-    include ::openstack::common::neutron
-    include ::midonet::midonet_agent
+class openstack::role::coordination inherits ::openstack::role {
+  class { '::openstack::profile::midonet::nsdb':}
 }

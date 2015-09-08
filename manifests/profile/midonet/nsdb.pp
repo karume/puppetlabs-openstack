@@ -1,4 +1,4 @@
-# == Class: openstack::profile::neutron::agent
+# == Class: openstack::profile::midonet::nsdb
 #
 # Copyright (c) 2015 Midokura SARL, All Rights Reserved.
 #
@@ -14,7 +14,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
-class openstack::profile::neutron::agent {
-    include ::openstack::common::neutron
-    include ::midonet::midonet_agent
+class openstack::profile::midonet::nsdb {
+
+    include ::midonet::zookeeper
+    include ::midonet::cassandra
+
 }
