@@ -1,10 +1,19 @@
-# A static class to set up a shared network. Should appear on the
-# controller node. It sets up the public network, a private network,
-# two subnets (one for admin, one for test), and the routers that
-# connect the subnets to the public network.
+# == Class: openstack::setup::sharednetwork
 #
-# After this class has run, you should have a functional network
-# avaiable for your test user to launch and connect machines to.
+# Copyright (c) 2015 Midokura SARL, All Rights Reserved.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#    http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+#
 class openstack::setup::sharednetwork {
 
   $external_network = $::openstack::config::network_external
@@ -18,10 +27,8 @@ class openstack::setup::sharednetwork {
 
   neutron_network { 'public':
     tenant_name              => 'services',
-    provider_network_type    => 'gre',
     router_external          => true,
-    provider_segmentation_id => 3604,
-    shared                   => true,
+    shared                   => false,
   } ->
 
   neutron_subnet { $external_network:
@@ -36,21 +43,19 @@ class openstack::setup::sharednetwork {
   }
 
   neutron_network { 'private':
-    tenant_name              => 'services',
-    provider_network_type    => 'gre',
+    tenant_name              => 'midokura',
     router_external          => false,
-    provider_segmentation_id => 4063,
-    shared                   => true,
+    shared                   => false,
   } ->
 
   neutron_subnet { $private_network:
-    cidr             => $private_network,
-    ip_version       => '4',
-    enable_dhcp      => true,
-    network_name     => 'private',
-    tenant_name      => 'services',
-    dns_nameservers  => [$dns],
-  } 
+    cidr            => $private_network,
+    ip_version      => '4',
+    enable_dhcp     => true,
+    network_name    => 'private',
+    tenant_name     => 'services',
+    dns_nameservers => [$dns],
+  }
 
-  openstack::setup::router { "test:${private_network}": }
+  openstack::setup::router { "midokura:${private_network}": }
 }
