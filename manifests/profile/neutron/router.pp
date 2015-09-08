@@ -1,25 +1,31 @@
-# The profile to set up a neutron ovs network router
+# == Class: openstack::profile::neutron::router
+#
+# Copyright (c) 2015 Midokura SARL, All Rights Reserved.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#    http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+#
 class openstack::profile::neutron::router {
-  ::sysctl::value { 'net.ipv4.ip_forward':
-    value     => '1',
-  }
 
   $controller_management_address = $::openstack::config::controller_address_management
 
   include ::openstack::common::neutron
-  include ::openstack::common::ml2::ovs
-
-
-  ### Router service installation
-  class { '::neutron::agents::l3':
-    debug                   => $::openstack::config::debug,
-    external_network_bridge => 'brex',
-    enabled                 => true,
-  }
+  include ::midonet::midonet_agent
 
   class { '::neutron::agents::dhcp':
-    debug   => $::openstack::config::debug,
-    enabled => true,
+    debug            => $::openstack::config::debug,
+    interface_driver => 'neutron.agent.linux.interface.MidonetInterfaceDriver',
+    dhcp_driver      => 'midonet.neutron.agent.midonet_driver.DhcpNoOpDriver',
+    enabled          => true,
   }
 
   class { '::neutron::agents::metadata':
@@ -31,44 +37,4 @@ class openstack::profile::neutron::router {
     metadata_ip   => $controller_management_address,
     enabled       => true,
   }
-
-  class { '::neutron::agents::lbaas':
-    debug   => $::openstack::config::debug,
-    enabled => true,
-  }
-
-  class { '::neutron::agents::vpnaas':
-    enabled => true,
-  }
-
-  class { '::neutron::agents::metering':
-    enabled => true,
-  }
-
-  class { '::neutron::services::fwaas':
-    enabled => true,
-  }
-
-  $external_bridge = 'brex'
-  $external_network = $::openstack::config::network_external
-  $external_device = device_for_network($external_network)
-  vs_bridge { $external_bridge:
-    ensure => present,
-  }
-  if $external_device != $external_bridge {
-    vs_port { $external_device:
-      ensure => present,
-      bridge => $external_bridge,
-    }
-  } else {
-    # External bridge already has the external device's IP, thus the external
-    # device has already been linked
-  }
-
-  $defaults = { 'ensure' => 'present' }
-  create_resources('neutron_network', $::openstack::config::networks, $defaults)
-  create_resources('neutron_subnet', $::openstack::config::subnets, $defaults)
-  create_resources('neutron_router', $::openstack::config::routers, $defaults)
-  create_resources('neutron_router_interface', $::openstack::config::router_interfaces, $defaults)
-
 }
