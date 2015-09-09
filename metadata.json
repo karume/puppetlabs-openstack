@@ -42,7 +42,7 @@
     { "name": "puppetlabs/firewall", "version_requirement": ">=1.0.0 <2.0.0" },
     { "name": "puppetlabs/mongodb", "version_requirement": ">=0.10.0 <0.11.0" },
     { "name": "puppetlabs/ntp", "version_requirement": ">=3.0.0 <4.0.0" },
-    { "name": "puppetlabs/rabbitmq", "version_requirement": ">=3.0.0 <4.0.0" },
+    { "name": "puppetlabs/rabbitmq", "version_requirement": ">=5.2.0 <5.2.3" },
     { "name": "stackforge/vswitch", "version_requirement": ">=1.0.0 <2.0.0" },
     { "name": "garethr/erlang", "version_requirement": "0.3.0" },
     { "name": "duritong/sysctl", "version_requirement": "0.0.1" },
